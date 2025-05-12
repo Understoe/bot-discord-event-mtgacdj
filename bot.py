@@ -6,7 +6,15 @@ from bs4 import BeautifulSoup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 TOKEN = os.getenv("DISCORD_TOKEN")
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+
+# Récupérer le Channel ID depuis les variables d'environnement
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+# Vérification si la variable CHANNEL_ID existe
+if CHANNEL_ID is None:
+    print("[ERREUR] CHANNEL_ID n'est pas défini dans les variables d'environnement")
+    exit(1)  # Terminer l'exécution du bot si la variable est manquante
+# Convertir le CHANNEL_ID en entier
+CHANNEL_ID = int(CHANNEL_ID)
 
 TAG_ROLES = {
     "MTG : Commander Multi": "@EDH",
