@@ -2,9 +2,10 @@ import discord
 import requests
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import os
 
-TOKEN = 'MTM3MTE5MzU2ODA4NTAyMDgzMg.Gi8X7m.s2BppdkdfRCwwIGrETqISpkM9X6WzK4e5hkbdA'  # token
-CHANNEL_ID = 1371189008738160652
+TOKEN = os.getenv("TOKEN")
+CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
 TAG_ROLES = {
     "MTG : Commander Multi": "@EDH",
