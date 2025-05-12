@@ -14,20 +14,20 @@ if not TOKEN or not CHANNEL_ID:
 
 CHANNEL_ID = int(CHANNEL_ID)
 
-TAG_ROLES = {
-    "MTG : Commander Multi": "@Commander EDH",
-    "MTG : Modern": "@Modern",
-    "MTG : Standard": "@Standard",
-    "MTG : Pioneer": "@Pioneer",
-    "MTG : Duel Commander": "@Duel Commander",
-    "MTG : Pauper": "1371421655041179672",
-    "MTG : Limité": "@Limité"
+# Tags suivis et leurs rôles Discord (ID numériques à récupérer dans Discord)
+ROLE_IDS = {
+    "MTG : Commander Multi": 1371421655041179672,
+    "MTG : Modern": 1371421655041179672,
+    "MTG : Standard": 1371421655041179672,
+    "MTG : Pioneer": 1371421655041179672,
+    "MTG : Duel Commander": 1371421655041179672,
+    "MTG : Pauper": 1371421655041179672,
+    "MTG : Limité": 1371421655041179672,
 }
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 scheduler = AsyncIOScheduler()
-
 
 def get_events():
     url = "https://au-coin-du-jeu.odoo.com/event"
@@ -35,34 +35,34 @@ def get_events():
     soup = BeautifulSoup(response.content, "html.parser")
 
     events = []
+
     event_blocks = soup.find_all("div", class_="col-md-6 col-lg-4 col-xl-3")
     print(f"[DEBUG] Nombre total de blocs trouvés : {len(event_blocks)}")
 
     for block in event_blocks:
         try:
+            # Vérifie qu'on est sur un événement Magic
             tags = block.find_all("span", class_="badge")
             tag_texts = [tag.get_text(strip=True) for tag in tags]
-
             if "Magic The Gathering" not in tag_texts:
                 continue
 
-            role = None
-            for tag in tag_texts:
-                if tag in TAG_ROLES:
-                    role = TAG_ROLES[tag]
-                    break
-
-            if not role:
+            # Cherche un tag secondaire qui correspond à un de ceux qu'on suit
+            tag_utilise = next((t for t in tag_texts if t in ROLE_IDS), None)
+            if not tag_utilise:
                 continue
 
+            # Nom de l'événement
             name_tag = block.find("span", itemprop="name")
             title = name_tag.get_text(strip=True) if name_tag else "Sans titre"
 
+            # Date
             day_tag = block.find("span", class_="o_wevent_event_day")
             month_tag = block.find("span", class_="o_wevent_event_month")
             day = day_tag.get_text(strip=True) if day_tag else "?"
             month = month_tag.get_text(strip=True) if month_tag else "?"
 
+            # Image de couverture
             cover_div = block.find("div", class_="o_record_cover_image")
             style_attr = cover_div.get("style", "") if cover_div else ""
             image_url = None
@@ -75,17 +75,16 @@ def get_events():
                 "title": title,
                 "date": f"{day} {month}",
                 "image": image_url,
-                "role": role
+                "role_id": ROLE_IDS[tag_utilise]
             })
 
-            print(f"[DEBUG] Événement ajouté : {title} | {day} {month} | {role}")
+            print(f"[DEBUG] Événement ajouté : {title} | {day} {month} | Tag : {tag_utilise}")
 
         except Exception as e:
             print(f"[ERREUR traitement bloc] {e}")
 
     print(f"[DEBUG] Nombre d'événements Magic trouvés : {len(events)}")
     return events
-
 
 async def envoyer_evenements():
     channel = client.get_channel(CHANNEL_ID)
@@ -109,18 +108,21 @@ async def envoyer_evenements():
         if ev["image"]:
             embed.set_image(url=ev["image"])
 
-        print(f"[DEBUG] Envoi de l'événement : {ev['title']} | Rôle : {ev['role']}")
-        await channel.send(content=ev["role"], embed=embed)
-
+        await channel.send(
+            content=f"<@&{ev['role_id']}>",
+            embed=embed,
+            allowed_mentions=discord.AllowedMentions(roles=True)
+        )
+        print(f"[DEBUG] Message envoyé pour : {ev['title']}")
 
 @client.event
 async def on_ready():
     print(f"✅ Connecté en tant que {client.user}")
-    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=9, minute=0)
+    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour='7-12')
     scheduler.start()
 
+    # Envoi immédiat pour test
     await envoyer_evenements()
-
 
 client.run(TOKEN)
 
