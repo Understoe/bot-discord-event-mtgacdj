@@ -104,7 +104,10 @@ async def envoyer_evenements():
     if not events:
         print("ℹ️ Aucun événement Magic trouvé.")
         return
-
+        
+    # 🔄 Inverser l'ordre pour que le plus proche soit en bas
+    events = list(reversed(events))
+    
     for ev in events:
         embed = discord.Embed(
             title=ev["title"],
