@@ -70,7 +70,7 @@ def get_events():
                 continue
 
             days_until = (event_date - datetime.datetime.now()).days
-            if days_until < 0 or days_until > 20:
+            if days_until < 0 and days_until > 20:
                 print(f"[DEBUG] Événement ignoré (dans {days_until} jours) : {title}")
                 continue
 
