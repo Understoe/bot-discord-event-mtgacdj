@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 TOKEN = os.getenv("DISCORD_TOKEN")
-CHANNEL_ID = os.getenv("CHANNEL_ID")
+CHANNEL_ID = None
 
 TAG_ROLES = {
     "MTG : Commander Multi": "@EDH",
@@ -82,11 +82,14 @@ async def envoyer_evenements():
             embed.set_image(url=ev["image"])
         await channel.send(content=ev["role"], embed=embed)
 
-@client.event
 async def on_ready():
+    global CHANNEL_ID
+    CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+
     print(f"✅ Connecté en tant que {client.user}")
-    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=9)
+    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=7, minute=0)
     scheduler.start()
+
     await envoyer_evenements()
 
 client.run(TOKEN)
