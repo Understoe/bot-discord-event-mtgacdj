@@ -120,7 +120,7 @@ async def envoyer_evenements():
 @client.event
 async def on_ready():
     print(f"✅ Connecté en tant que {client.user}")
-    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=7, minute=0)
+    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=12, minute=3)
     scheduler.start()
 
     # Envoi immédiat pour test
