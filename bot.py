@@ -5,7 +5,9 @@ import requests
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+
 TOKEN = os.getenv("DISCORD_TOKEN")
+print(f"[DEBUG] TOKEN reçu : {repr(TOKEN)}") 
 CHANNEL_ID = None
 
 TAG_ROLES = {
