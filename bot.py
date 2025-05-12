@@ -15,13 +15,13 @@ if not TOKEN or not CHANNEL_ID:
 CHANNEL_ID = int(CHANNEL_ID)
 
 TAG_ROLES = {
-    "MTG : Commander Multi": "@EDH",
-    "MTG : Modern": "@modern",
-    "MTG : Standard": "@standard",
-    "MTG : Pioneer": "@pionner",
-    "MTG : Duel Commander": "@DC",
-    "MTG : Pauper": "@pauper",
-    "MTG : Limité": "@limité"
+    "MTG : Commander Multi": "@Commander EDH",
+    "MTG : Modern": "@Modern",
+    "MTG : Standard": "@Standard",
+    "MTG : Pioneer": "@Pioneer",
+    "MTG : Duel Commander": "@Duel Commander",
+    "MTG : Pauper": "@Pauper",
+    "MTG : Limité": "@Limité"
 }
 
 intents = discord.Intents.default()
