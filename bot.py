@@ -73,10 +73,16 @@ def get_events():
                 end = style_attr.find(")", start)
                 image_url = "https://au-coin-du-jeu.odoo.com" + style_attr[start:end]
 
+            #Récupération du lien
+            link_tag = block.find("a", href=True)
+            relative_url = link_tag["href"] if link_tag else ""
+            event_url = "https://au-coin-du-jeu.odoo.com" + relative_url
+
             events.append({
                 "title": title,
                 "date": f"{day} {month}",
                 "image": image_url,
+                "url": event_url
                 "role_id": ROLE_IDS[tag_utilise]
             })
 
@@ -111,6 +117,7 @@ async def envoyer_evenements():
     for ev in events:
         embed = discord.Embed(
             title=ev["title"],
+            url=ev["url"],  # 👈 Lien cliquable sur le titre
             description=f"📅 {ev['date']}",
             color=discord.Color.blue()
         )
