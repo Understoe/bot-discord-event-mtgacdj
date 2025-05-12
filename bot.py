@@ -20,7 +20,7 @@ TAG_ROLES = {
     "MTG : Standard": "@Standard",
     "MTG : Pioneer": "@Pioneer",
     "MTG : Duel Commander": "@Duel Commander",
-    "MTG : Pauper": "@Pauper",
+    "MTG : Pauper": "1371421655041179672",
     "MTG : Limité": "@Limité"
 }
 
