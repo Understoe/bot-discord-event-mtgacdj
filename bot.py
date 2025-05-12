@@ -124,7 +124,7 @@ async def on_ready():
     scheduler.start()
 
     # Envoi immédiat pour test
-    await envoyer_evenements()
+    #await envoyer_evenements()
 
 client.run(TOKEN)
 
