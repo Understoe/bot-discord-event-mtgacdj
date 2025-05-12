@@ -1,14 +1,10 @@
-
-import os
 import discord
 import requests
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-
-TOKEN = os.getenv("DISCORD_TOKEN")
-print(f"[DEBUG] TOKEN reçu : {repr(TOKEN)}") 
-CHANNEL_ID = None
+TOKEN = 'MTM3MTE5MzU2ODA4NTAyMDgzMg.Gi8X7m.s2BppdkdfRCwwIGrETqISpkM9X6WzK4e5hkbdA'  # token
+CHANNEL_ID = 1371189008738160652
 
 TAG_ROLES = {
     "MTG : Commander Multi": "@EDH",
@@ -24,19 +20,33 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 scheduler = AsyncIOScheduler()
 
+
 def get_events():
     url = "https://au-coin-du-jeu.odoo.com/event"
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
+
     events = []
     event_blocks = soup.find_all("div", class_="col-md-6 col-lg-4 col-xl-3")
+    print(f"[DEBUG] Nombre total de blocs trouvés : {len(event_blocks)}")
 
     for block in event_blocks:
         try:
             tags = block.find_all("span", class_="badge")
             tag_texts = [tag.get_text(strip=True) for tag in tags]
+
             if "Magic The Gathering" not in tag_texts:
                 continue
+
+            # Cherche un tag qui correspond à nos catégories
+            role = None
+            for tag in tag_texts:
+                if tag in TAG_ROLES:
+                    role = TAG_ROLES[tag]
+                    break
+
+            if not role:
+                continue  # On ignore si aucun rôle/tag ne correspond
 
             name_tag = block.find("span", itemprop="name")
             title = name_tag.get_text(strip=True) if name_tag else "Sans titre"
@@ -54,21 +64,26 @@ def get_events():
                 end = style_attr.find(")", start)
                 image_url = "https://au-coin-du-jeu.odoo.com" + style_attr[start:end]
 
-            role = next((TAG_ROLES[tag] for tag in tag_texts if tag in TAG_ROLES), "")
-
             events.append({
                 "title": title,
                 "date": f"{day} {month}",
                 "image": image_url,
                 "role": role
             })
+
+            print(f"[DEBUG] Événement ajouté : {title} | {day} {month} | {role}")
+
         except Exception as e:
             print(f"[ERREUR traitement bloc] {e}")
 
+    print(f"[DEBUG] Nombre d'événements Magic trouvés : {len(events)}")
     return events
+
 
 async def envoyer_evenements():
     channel = client.get_channel(CHANNEL_ID)
+    print(f"[DEBUG] Channel récupéré : {channel}")
+
     if not channel:
         print("❌ Salon introuvable. Vérifiez le CHANNEL_ID.")
         return
@@ -79,19 +94,25 @@ async def envoyer_evenements():
         return
 
     for ev in events:
-        embed = discord.Embed(title=ev["title"], description=f"📅 {ev['date']}", color=discord.Color.blue())
+        embed = discord.Embed(
+            title=ev["title"],
+            description=f"📅 {ev['date']}",
+            color=discord.Color.blue()
+        )
         if ev["image"]:
             embed.set_image(url=ev["image"])
+
+        print(f"[DEBUG] Envoi de l'événement : {ev['title']} | Rôle : {ev['role']}")
         await channel.send(content=ev["role"], embed=embed)
 
-async def on_ready():
-    global CHANNEL_ID
-    CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
+@client.event
+async def on_ready():
     print(f"✅ Connecté en tant que {client.user}")
-    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=7, minute=0)
+    scheduler.add_job(envoyer_evenements, 'cron', hour=9, minute=0)
     scheduler.start()
 
     await envoyer_evenements()
+
 
 client.run(TOKEN)
