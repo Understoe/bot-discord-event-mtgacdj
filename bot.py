@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import os
 
+print(f"[DEBUG] TOKEN: {os.getenv('TOKEN')}")
+print(f"[DEBUG] CHANNEL_ID: {os.getenv('CHANNEL_ID')}")
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
