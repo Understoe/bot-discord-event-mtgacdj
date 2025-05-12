@@ -16,13 +16,13 @@ CHANNEL_ID = int(CHANNEL_ID)
 
 # Tags suivis et leurs rôles Discord (ID numériques à récupérer dans Discord)
 ROLE_IDS = {
-    "MTG : Commander Multi": 1371421655041179672,
-    "MTG : Modern": 1371421655041179672,
-    "MTG : Standard": 1371421655041179672,
-    "MTG : Pioneer": 1371421655041179672,
-    "MTG : Duel Commander": 1371421655041179672,
-    "MTG : Pauper": 1371421655041179672,
-    "MTG : Limité": 1371421655041179672,
+    "MTG : Commander Multi": 1067857193673699429,
+    "MTG : Modern": 1067857029470896178,
+    "MTG : Standard": 1067857092561608764,
+    "MTG : Pioneer": 1067857419369205951,
+    "MTG : Duel Commander": 1067857231288217681,
+    "MTG : Pauper": 1067857461417099314,
+    "MTG : Limité": 1067857130176118855,
 }
 
 intents = discord.Intents.default()
