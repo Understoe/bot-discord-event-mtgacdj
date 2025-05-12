@@ -3,11 +3,16 @@ import requests
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import os
+import sys
 
-print(f"[DEBUG] TOKEN: {os.getenv('TOKEN')}")
-print(f"[DEBUG] CHANNEL_ID: {os.getenv('CHANNEL_ID')}")
 TOKEN = os.getenv("TOKEN")
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+
+if not TOKEN or not CHANNEL_ID:
+    print("❌ TOKEN ou CHANNEL_ID manquant.")
+    sys.exit(1)
+
+CHANNEL_ID = int(CHANNEL_ID)
 
 TAG_ROLES = {
     "MTG : Commander Multi": "@EDH",
@@ -41,7 +46,6 @@ def get_events():
             if "Magic The Gathering" not in tag_texts:
                 continue
 
-            # Cherche un tag qui correspond à nos catégories
             role = None
             for tag in tag_texts:
                 if tag in TAG_ROLES:
@@ -49,7 +53,7 @@ def get_events():
                     break
 
             if not role:
-                continue  # On ignore si aucun rôle/tag ne correspond
+                continue
 
             name_tag = block.find("span", itemprop="name")
             title = name_tag.get_text(strip=True) if name_tag else "Sans titre"
@@ -112,10 +116,11 @@ async def envoyer_evenements():
 @client.event
 async def on_ready():
     print(f"✅ Connecté en tant que {client.user}")
-    scheduler.add_job(envoyer_evenements, 'cron', hour=9, minute=0)
+    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=9, minute=0)
     scheduler.start()
 
     await envoyer_evenements()
 
 
 client.run(TOKEN)
+
