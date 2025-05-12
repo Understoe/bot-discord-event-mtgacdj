@@ -96,6 +96,10 @@ async def envoyer_evenements():
         print("❌ Salon introuvable. Vérifiez le CHANNEL_ID.")
         return
 
+    # Effacer les anciens messages
+    async for message in channel.history(limit=100):  # 'limit=100' pour éviter de supprimer trop de messages
+        await message.delete()
+        
     events = get_events()
     if not events:
         print("ℹ️ Aucun événement Magic trouvé.")
@@ -120,7 +124,7 @@ async def envoyer_evenements():
 @client.event
 async def on_ready():
     print(f"✅ Connecté en tant que {client.user}")
-    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=12, minute=3)
+    scheduler.add_job(envoyer_evenements, 'cron', day_of_week='mon', hour=12, minute=14)
     scheduler.start()
 
     # Envoi immédiat pour test
