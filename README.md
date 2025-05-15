@@ -1,11 +1,4 @@
 # Bot Discord Magic (Railway)
-Déploie ton bot Discord Magic sur Railway.
+Ce bot se réveille le Lundi et s'éteint le Mardi.
 
-## Déploiement rapide
-1. Clone ou crée un dépôt GitHub avec ces fichiers
-2. Va sur https://railway.app
-3. Clique sur "New Project" > "Deploy from GitHub Repo"
-4. Ajoute les variables d'environnement :
-   - DISCORD_TOKEN
-   - CHANNEL_ID
-5. Le bot s'exécutera tous les lundis à 9h
+Son but est de récupérer les informations concernant les évènements Magic que fait la boutique Au coin du Jeu
