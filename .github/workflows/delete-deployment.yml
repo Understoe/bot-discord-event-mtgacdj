@@ -1,0 +1,33 @@
+name: Delete Railway Deployment on Tuesday
+
+on:
+  schedule:
+    - cron: '0 1 * * 2' # Tous les mardis à 1h UTC (3h du matin en France)
+  workflow_dispatch:
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get deployment environments
+        id: get_envs
+        run: |
+          curl -s -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+          "https://backboard.railway.app/graphql" \
+          -H "Content-Type: application/json" \
+          -d '{"query":"query { environments(projectId: \"${{ secrets.RAILWAY_PROJECT_ID }}\") { edges { node { id name }}}}"}' \
+          > envs.json
+
+          cat envs.json
+
+      - name: Delete environments (except production)
+        run: |
+          ENV_IDS=$(jq -r '.data.environments.edges[].node | select(.name != "production") | .id' envs.json)
+          
+          for ENV_ID in $ENV_IDS; do
+            echo "Deleting env: $ENV_ID"
+            curl -X POST "https://backboard.railway.app/graphql" \
+              -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"query\":\"mutation { deleteEnvironment(id: \\\"$ENV_ID\\\") }\"}"
+          done
